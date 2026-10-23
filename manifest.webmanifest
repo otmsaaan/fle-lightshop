@@ -1,0 +1,14 @@
+{
+  "name": "Flecity Exotic Light Shop",
+  "short_name": "Flecity Shop",
+  "description": "花火・ネオン装飾の販売計算ツール",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#080b20",
+  "theme_color": "#080b20",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+  ]
+}
