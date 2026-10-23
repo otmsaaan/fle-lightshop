@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#172554">
+<title>Flecity Exotic Light Shop | 販売計算</title>
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--ink:#182230;--muted:#667085;--line:#dce3ee;--primary:#1d4ed8;--primary2:#172554;--danger:#b42318;--green:#087443;--soft:#eaf1ff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}header{background:linear-gradient(135deg,#172554,#1d4ed8);color:white;padding:22px max(16px,calc((100% - 1100px)/2)) 18px}header h1{font-size:clamp(20px,4vw,30px);margin:0 0 5px}header p{margin:0;color:#dbeafe;font-size:13px}.wrap{max-width:1100px;margin:0 auto;padding:16px}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}.tab{border:1px solid var(--line);background:white;color:var(--ink);border-radius:999px;padding:10px 15px;font-weight:700;cursor:pointer}.tab.active{background:var(--primary2);color:white;border-color:var(--primary2)}.panel{display:none}.panel.active{display:block}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 2px 7px #17255408}.card h2{font-size:18px;margin:0 0 13px}.row{display:flex;align-items:center;gap:10px}.between{justify-content:space-between}.muted{color:var(--muted);font-size:13px}.total{font-size:clamp(26px,5vw,36px);font-weight:800;letter-spacing:-.5px;color:var(--green);overflow-wrap:anywhere}.field{display:flex;flex-direction:column;gap:6px;margin-bottom:11px;min-width:0}.field label{font-size:13px;font-weight:700;color:#344054}input,select,button{font:inherit}input,select{width:100%;min-width:0;border:1px solid #cbd5e1;border-radius:10px;padding:10px 11px;background:#fff;color:var(--ink)}input[type=number]{text-align:right}.btn{border:0;border-radius:10px;padding:10px 13px;background:var(--primary);color:white;font-weight:700;cursor:pointer}.btn.secondary{background:#e8edf5;color:#24324a}.btn.danger{background:#fee4e2;color:var(--danger)}.btn.small{padding:7px 10px;font-size:13px}.btn:active,.tab:active{transform:translateY(1px)}.product-list{display:flex;flex-direction:column;gap:9px}.product-row{display:grid;grid-template-columns:minmax(0,1fr) 90px 110px;gap:10px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:11px}.product-row .name{font-weight:700;overflow-wrap:anywhere}.product-row .price{font-size:13px;color:var(--muted)}.product-row input{padding:8px}.subtotal{text-align:right;font-weight:800;white-space:nowrap}.total-box{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--soft);border-radius:12px;padding:15px;margin:14px 0}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px}.category{background:#eef2ff;color:#3730a3;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800;display:inline-block;margin-bottom:5px}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:620px}th,td{text-align:left;border-bottom:1px solid var(--line);padding:11px 9px;vertical-align:top;font-size:14px}th{font-size:12px;color:var(--muted);background:#f8fafc}td.num,th.num{text-align:right;white-space:nowrap}.empty{padding:25px;text-align:center;color:var(--muted)}.section-title{margin:20px 0 10px;font-size:16px}.notice{border-radius:10px;background:#fff7e6;color:#854d0e;padding:11px 12px;font-size:13px;margin-bottom:12px}.success-note{background:#ecfdf3;color:#067647}.history-card{margin-bottom:10px}.history-head{display:flex;justify-content:space-between;gap:10px;align-items:start}.history-lines{font-size:13px;color:var(--muted);margin:9px 0}.history-total{font-weight:800;color:var(--green);font-size:18px}.hidden{display:none!important}footer{text-align:center;color:var(--muted);font-size:12px;padding:25px 12px}
+
+.modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.58);display:flex;align-items:center;justify-content:center;padding:18px;z-index:9999}
+.modal-backdrop.hidden{display:none!important}.modal-card{background:#fff;border-radius:18px;padding:22px;width:min(100%,430px);box-shadow:0 20px 60px #0003}.modal-card h2{margin:0 0 10px;font-size:20px}.modal-card p{margin:0;color:#475467;line-height:1.6;overflow-wrap:anywhere}
+\n
+/* Responsive readability fixes */
+html{ -webkit-text-size-adjust:100%; }
+body{min-width:0;overflow-x:hidden}
+.wrap,main,section,.card,.grid,.row{min-width:0}
+button{white-space:normal;line-height:1.35;touch-action:manipulation}
+.product-row .name,.history-lines,.history-head,.modal-card p{overflow-wrap:break-word;word-break:normal}
+.history-head>div{min-width:0}
+.history-head>div:last-child{flex-shrink:0}
+.history-lines{line-height:1.65}
+@media(max-width:480px){
+  header{padding:18px 14px}
+  .wrap{padding:9px}
+  .tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tab{width:100%;min-width:0;border-radius:12px;padding:10px 6px}
+  .product-row{grid-template-columns:minmax(0,1fr) 72px 88px;gap:8px}
+  .product-row .name{font-size:14px;line-height:1.4;overflow-wrap:anywhere;word-break:normal}.product-row .category{display:inline-block;max-width:100%;white-space:normal;word-break:keep-all;overflow-wrap:normal;line-height:1.3}
+  .product-row .price{overflow-wrap:break-word}
+  .product-row input{font-size:16px;min-width:0}
+  .history-head{align-items:flex-start}
+  .history-head>div:last-child{max-width:45%}
+  .history-head .btn{max-width:100%;font-size:12px;padding:7px}
+  .history-total{font-size:16px}
+  .total{font-size:28px}
+  .card{overflow-wrap:break-word}
+  .table-wrap{max-width:100%;overflow-x:auto}
+}
+\n@media(max-width:760px){.grid{grid-template-columns:minmax(0,1fr)}.wrap{padding:12px}.product-row{grid-template-columns:minmax(0,1fr) 72px 90px;gap:7px;padding:9px}.product-row .name{font-size:14px}.product-row .price{font-size:12px}.product-row input{padding:8px 5px}.subtotal{font-size:13px}.card{padding:13px}.total-box{align-items:flex-start;flex-direction:column}.tabs{gap:6px}.tab{padding:9px 12px;font-size:13px}}
+
+@media(max-width:760px){
+  .grid{grid-template-columns:minmax(0,1fr)!important}
+  .product-row{grid-template-columns:minmax(0,1fr) 76px 88px!important;align-items:center}
+  .product-row>div:first-child{min-width:0}
+  .product-row .category{max-width:100%;white-space:normal;word-break:keep-all;overflow-wrap:normal}
+  .product-row .name{white-space:normal;word-break:normal;overflow-wrap:anywhere}
+  .product-row .price{white-space:normal;word-break:normal}
+  .product-row input{width:100%;min-width:0}
+  .product-row .subtotal{white-space:nowrap}
+  .total-box{display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
+  .total-box>div{min-width:0}
+  #confirmSale{max-width:120px;flex-shrink:0}
+}
+@media(max-width:420px){
+  .product-row{grid-template-columns:minmax(0,1fr) 64px 76px!important;gap:6px!important}
+  .product-row .name{font-size:13px}
+  .product-row .price{font-size:11px}
+  .total-box{align-items:flex-start}
+  #confirmSale{max-width:100px;padding:10px 8px}
+}
+
+.qty-control{min-width:0}.qty-buttons{display:flex;align-items:center;gap:4px}.qty-buttons input{width:48px;min-width:0;padding:8px 2px;text-align:center;font-size:16px}.qty-step{width:30px;height:36px;flex:0 0 30px;padding:0;border:1px solid #cbd5e1;border-radius:9px;background:#eef2ff;color:#1d4ed8;font-size:21px;font-weight:800;line-height:1;cursor:pointer;touch-action:manipulation}.qty-step:active{background:#dbeafe}.product-row{grid-template-columns:minmax(0,1fr) auto;row-gap:8px}.product-info{grid-column:1/-1;min-width:0}.qty-control{grid-column:1;grid-row:2}.product-row .subtotal{grid-column:2;grid-row:2;align-self:end;padding-bottom:8px}.qty-control label{display:block;margin-bottom:4px}
+@media(max-width:420px){.product-row{grid-template-columns:minmax(0,1fr) auto!important;gap:8px!important}.qty-buttons{gap:4px}.qty-buttons input{width:42px}.qty-step{width:32px;flex-basis:32px}.product-row .subtotal{font-size:14px}}
+
+/* Price readability: make unit prices and subtotals prominent */
+.product-row .price{font-size:16px;font-weight:600;color:#475467;line-height:1.4;margin-top:3px}
+.product-row .subtotal{font-size:clamp(19px,4.5vw,24px);font-weight:850;color:#102a56;letter-spacing:-.2px}
+.sale-price-label{font-size:12px;color:#667085;font-weight:700;margin-bottom:2px}
+.product-row .price strong{font-size:inherit}
+@media(max-width:760px){
+ .product-row .price{font-size:16px}
+ .product-row .subtotal{font-size:21px}
+ .product-row .qty-control label{font-size:14px}
+}
+@media(max-width:420px){
+ .product-row .price{font-size:15px}
+ .product-row .subtotal{font-size:19px}
+}
+</style>
+</head>
+<body>
+<header><h1>Flecity Exotic Light Shop</h1><p>商品販売計算ツール · 端末ごとに保存</p></header>
+<main class="wrap">
+<nav class="tabs" aria-label="メインメニュー">
+<button class="tab active" data-tab="sale">販売計算</button>
+<button class="tab" data-tab="products">商品管理</button>
+<button class="tab" data-tab="history">売上履歴</button>
+<button class="tab" data-tab="backup">設定・バックアップ</button>
+</nav>
+
+<section id="sale" class="panel active">
+<div class="grid">
+<div class="card">
+<h2>販売する商品</h2>
+<div class="field"><label for="searchProduct">商品を検索</label><input id="searchProduct" placeholder="商品名で検索…" autocomplete="off"></div>
+<div id="saleProducts" class="product-list"></div>
+<div id="saleEmpty" class="empty hidden">商品がありません。商品管理から追加してください。</div>
+</div>
+<div class="card">
+<h2>今回の販売</h2>
+<div class="field"><label for="customProduct">未登録の商品名（任意）</label><input id="customProduct" placeholder="商品名を入力"></div>
+<div class="grid" style="grid-template-columns:1fr 1fr;gap:10px">
+<div class="field"><label for="customPrice">単価 ($)</label><input id="customPrice" type="number" min="0" step="1" placeholder="0"></div>
+<div class="field"><label for="customQty">数量</label><input id="customQty" type="number" min="1" step="1" value="1"></div>
+</div>
+<button class="btn secondary" id="addCustom">未登録商品を今回の販売に追加</button>
+<div id="cart" style="margin-top:14px"></div>
+<div class="total-box"><div><div class="muted">今回の販売合計</div><div id="saleTotal" class="total">0$</div><div id="saleCount" class="muted">商品数：0個</div></div><button id="confirmSale" class="btn">販売を確定</button></div>
+<div class="muted">※ 販売確定すると履歴に保存されます。数量0の商品は計算に含まれません。</div>
+</div>
+</div>
+</section>
+
+<section id="products" class="panel">
+<div class="grid">
+<div class="card">
+<h2>商品を追加</h2>
+<div class="field"><label for="newCategory">カテゴリー</label><select id="newCategory"><option>ネオン・ヘッドライト</option><option>花火</option><option>その他</option></select></div>
+<div class="field"><label for="newName">商品名</label><input id="newName" placeholder="商品名"></div>
+<div class="field"><label for="newPrice">販売価格 ($)</label><input id="newPrice" type="number" min="0" step="1" placeholder="価格"></div>
+<button id="createProduct" class="btn">商品を登録</button>
+</div>
+<div class="card">
+<h2>商品管理について</h2>
+<p class="muted">商品名や価格はいつでも変更できます。商品を削除しても、過去の売上履歴は残ります。車両・バイクの施工費は、それぞれ別の商品として登録されています。</p>
+<div class="notice">「車両1台につき1回のみ」の施工ルールはメモとして登録しています。計算ツールが施工回数を自動制限するわけではありません。</div>
+</div>
+</div>
+<h2 class="section-title">登録済み商品</h2>
+<div class="card table-wrap"><table><thead><tr><th>カテゴリー</th><th>商品名</th><th class="num">価格 ($)</th><th>操作</th></tr></thead><tbody id="productTable"></tbody></table><div id="productsEmpty" class="empty hidden">商品がありません。</div></div>
+</section>
+
+<section id="history" class="panel">
+<div class="card">
+<h2>売上履歴</h2>
+<div class="grid">
+<div class="field"><label for="historyDate">日付を指定して削除</label><input id="historyDate" type="date"></div>
+<div class="field" style="justify-content:end"><button id="deleteDate" class="btn danger">指定日の履歴を削除</button></div>
+</div>
+<div class="toolbar"><button id="deleteAll" class="btn danger">全履歴を削除</button><button id="exportCsv" class="btn secondary">履歴をCSV出力</button></div>
+<div class="notice">履歴を削除しても、商品一覧と商品価格は削除されません。削除前にバックアップを取ることをおすすめします。</div>
+<div id="historyList"></div>
+<div id="historyEmpty" class="empty hidden">売上履歴はまだありません。</div>
+</div>
+</section>
+
+<section id="backup" class="panel">
+<div class="grid">
+<div class="card">
+<h2>データのバックアップ</h2>
+<p class="muted">商品一覧と売上履歴をJSONファイルとして保存できます。端末の変更やブラウザデータ消去に備えて、定期的に保存してください。</p>
+<button id="exportJson" class="btn">バックアップを書き出す</button>
+</div>
+<div class="card">
+<h2>バックアップの復元</h2>
+<p class="muted">以前に書き出したJSONファイルを読み込みます。現在のデータは上書きされるため、必要なら先にバックアップしてください。</p>
+<div class="field"><label for="importFile">バックアップファイル</label><input id="importFile" type="file" accept=".json,application/json"></div>
+<button id="importJson" class="btn secondary">選択したファイルを復元</button>
+</div>
+</div>
+<div class="card" style="margin-top:14px"><h2>保存について</h2><p class="muted">データはこのブラウザの端末内に保存されます。スマホとPCで自動共有はされません。ブラウザのサイトデータを消去するとデータが消える場合があるため、バックアップを保管してください。</p><button id="resetEverything" class="btn danger">商品・履歴をすべて初期化</button></div>
+</section>
+</main>
+
+<div id="saleConfirmModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="saleConfirmTitle">
+  <div class="modal-card">
+    <h2 id="saleConfirmTitle">販売を確定しますか？</h2>
+    <p id="saleConfirmMessage">今回の販売を売上履歴に保存します。</p>
+    <div class="row" style="justify-content:flex-end;flex-wrap:wrap;margin-top:18px">
+      <button id="cancelSaleConfirm" class="btn secondary">戻る</button>
+      <button id="acceptSaleConfirm" class="btn">保存する</button>
+    </div>
+  </div>
+</div>
+
+<div id="actionConfirmModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="actionConfirmTitle">
+  <div class="modal-card">
+    <h2 id="actionConfirmTitle">確認</h2>
+    <p id="actionConfirmMessage"></p>
+    <div class="row" style="justify-content:flex-end;flex-wrap:wrap;margin-top:18px">
+      <button id="actionConfirmCancel" class="btn secondary">キャンセル</button>
+      <button id="actionConfirmOk" class="btn danger">実行する</button>
+    </div>
+  </div>
+</div>
+<footer>Flecity Exotic Light Shop · ローカル保存版</footer>
+<script>
+const KEY='flecity_exotic_light_shop_v1';
+const starterProducts=[
+{id:'p1',category:'ネオン・ヘッドライト',name:'車両へのネオン取付・登録費用（各車両1回のみ）',price:250000},
+{id:'p2',category:'ネオン・ヘッドライト',name:'バイクのヘッドライト施工費（各車両1回のみ）',price:100000},
+{id:'p3',category:'ネオン・ヘッドライト',name:'ネオンコントローラー',price:200000},
+{id:'p4',category:'花火',name:'PYRO SMALL',price:5000},
+{id:'p5',category:'花火',name:'PYRO PIRATE（フラッシュ2回）',price:5000},
+{id:'p6',category:'花火',name:'SOLAR FLARE（手持ち）',price:10000},
+{id:'p7',category:'花火',name:'PYRO MEDIUM',price:10000},
+{id:'p8',category:'花火',name:'FONTAIN',price:20000},
+{id:'p9',category:'花火',name:'PYRO LARGE',price:20000},
+{id:'p10',category:'花火',name:'ROCKET',price:20000},
+{id:'p11',category:'花火',name:'PYRO RUG（フラッシュ20回）',price:20000},
+{id:'p12',category:'花火',name:'PYRO RUG LONG（飛星20回）',price:30000},
+{id:'p13',category:'花火',name:'PYRO MEGA',price:30000},
+{id:'p14',category:'花火',name:'FLARE 1（むらさき）',price:50000},
+{id:'p15',category:'花火',name:'FLARE 2（あか）',price:50000},
+{id:'p16',category:'花火',name:'FLARE 3（あお）',price:50000},
+{id:'p17',category:'花火',name:'fireworks normal',price:1000000}
+];
+let state=loadState();
+let cart={};
+function loadState(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&Array.isArray(s.products)&&Array.isArray(s.history))return s;}catch(e){}return {products:starterProducts.map(p=>({...p})),history:[]};}
+function save(){
+ try{localStorage.setItem(KEY,JSON.stringify(state));return true;}
+ catch(e){alert('このブラウザではデータを保存できませんでした。ブラウザの設定でローカルデータ保存が制限されていないか確認してください。バックアップを書き出して保管してください。');return false;}
+}
+function money(n){return new Intl.NumberFormat('en-US',{maximumFractionDigits:0}).format(Number(n)||0)+'$';}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function id(){return 'x'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+function switchTab(tab){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===tab));}
+let actionConfirmResolver=null;
+function askConfirm(message,title='確認',okLabel='実行する'){
+ return new Promise(resolve=>{
+   actionConfirmResolver=resolve;
+   document.getElementById('actionConfirmTitle').textContent=title;
+   document.getElementById('actionConfirmMessage').textContent=message;
+   document.getElementById('actionConfirmOk').textContent=okLabel;
+   document.getElementById('actionConfirmModal').classList.remove('hidden');
+ });
+}
+function closeActionConfirm(result){
+ document.getElementById('actionConfirmModal').classList.add('hidden');
+ if(actionConfirmResolver){const r=actionConfirmResolver;actionConfirmResolver=null;r(result);}
+}
+document.getElementById('actionConfirmCancel').addEventListener('click',()=>closeActionConfirm(false));
+document.getElementById('actionConfirmOk').addEventListener('click',()=>closeActionConfirm(true));
+
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
+function renderSale(){
+ const q=document.getElementById('searchProduct').value.toLowerCase();
+ const list=document.getElementById('saleProducts');list.innerHTML='';
+ const filtered=state.products.filter(p=>(p.name+' '+p.category).toLowerCase().includes(q));
+ document.getElementById('saleEmpty').classList.toggle('hidden',filtered.length>0);
+ filtered.forEach(p=>{const div=document.createElement('div');div.className='product-row';div.innerHTML=`<div class="product-info"><div class="category">${esc(p.category)}</div><div class="name">${esc(p.name)}</div><div class="price">${money(p.price)} / 個</div></div><div class="qty-control"><label class="muted" for="qty-${p.id}">数量</label><div class="qty-buttons"><button type="button" class="qty-step" data-step="-1" aria-label="${esc(p.name)}を1個減らす">−</button><input id="qty-${p.id}" type="number" min="0" step="1" value="${cart[p.id]?.qty||''}" placeholder="0" inputmode="numeric" pattern="[0-9]*" aria-label="${esc(p.name)}の数量"><button type="button" class="qty-step" data-step="1" aria-label="${esc(p.name)}を1個増やす">＋</button></div></div><div class="subtotal" id="sub-${p.id}">${money((cart[p.id]?.qty||0)*p.price)}</div>`;list.appendChild(div);const inp=div.querySelector('input');const updateQty=()=>{const qty=Math.max(0,Math.floor(Number(inp.value)||0));cart[p.id]={productId:p.id,name:p.name,price:Number(p.price),qty,category:p.category};document.getElementById('sub-'+p.id).textContent=money(qty*p.price);renderCartTotals();};inp.addEventListener('input',updateQty);div.querySelectorAll('.qty-step').forEach(btn=>btn.addEventListener('click',()=>{const current=Math.max(0,Math.floor(Number(inp.value)||0));const next=Math.max(0,current+Number(btn.dataset.step));inp.value=next===0?'':String(next);updateQty();}));});
+ renderCartTotals();renderCart();
+}
+function renderCartTotals(){let total=0,count=0;state.products.forEach(p=>{const q=cart[p.id]?.qty||0;total+=q*p.price;count+=q;});if(cart.__custom){total+=cart.__custom.qty*cart.__custom.price;count+=cart.__custom.qty;}document.getElementById('saleTotal').textContent=money(total);document.getElementById('saleCount').textContent='商品数：'+count+'個';}
+function renderCart(){const el=document.getElementById('cart');const items=Object.values(cart).filter(x=>x&&x.qty>0);if(!items.length){el.innerHTML='<div class="empty">数量を入力すると、販売内容がここに表示されます。</div>';return;}el.innerHTML='<h3 style="font-size:14px;margin:0 0 8px">販売内容</h3>'+items.map(x=>`<div class="row between" style="padding:6px 0;border-bottom:1px solid var(--line);gap:8px"><div style="min-width:0;overflow-wrap:anywhere"><strong>${esc(x.name)}</strong><div class="muted">${money(x.price)} × ${x.qty}</div></div><strong style="white-space:nowrap">${money(x.price*x.qty)}</strong></div>`).join('');}
+document.getElementById('searchProduct').addEventListener('input',renderSale);
+document.getElementById('addCustom').addEventListener('click',()=>{const name=document.getElementById('customProduct').value.trim();const price=Number(document.getElementById('customPrice').value);const qty=Math.floor(Number(document.getElementById('customQty').value));if(!name){alert('未登録商品の名前を入力してください。');return;}if(!Number.isFinite(price)||price<0||!Number.isInteger(price)){alert('単価は0以上の整数で入力してください。');return;}if(!Number.isInteger(qty)||qty<1){alert('数量は1以上で入力してください。');return;}cart.__custom={productId:null,category:'自由入力',name,price,qty};renderCart();renderCartTotals();document.getElementById('customProduct').value='';document.getElementById('customPrice').value='';document.getElementById('customQty').value='1';});
+let pendingSale=null;
+function buildSaleItems(){
+ // Read visible inputs directly at confirmation time as well as using cart state.
+ // This prevents desktop browser input-event timing differences from dropping quantities.
+ document.querySelectorAll('#saleProducts input[id^="qty-"]').forEach(inp=>{
+   const productId=inp.id.slice(4);
+   const p=state.products.find(x=>x.id===productId);
+   if(!p)return;
+   const qty=Math.max(0,Math.floor(Number(inp.value)||0));
+   if(qty>0)cart[p.id]={productId:p.id,name:p.name,price:Number(p.price),qty,category:p.category};
+   else if(cart[p.id])cart[p.id].qty=0;
+ });
+ return Object.values(cart).filter(x=>x&&Number(x.qty)>0).map(x=>({
+   productId:x.productId||null,category:x.category,name:x.name,
+   price:Number(x.price),qty:Number(x.qty),subtotal:Number(x.price)*Number(x.qty)
+ }));
+}
+document.getElementById('confirmSale').addEventListener('click',()=>{
+ try{
+   const items=buildSaleItems();
+   if(!items.length){alert('数量を入力するか、未登録商品を追加してください。');return;}
+   const total=items.reduce((a,x)=>a+x.subtotal,0);
+   pendingSale={items,total};
+   document.getElementById('saleConfirmMessage').textContent='今回の販売 '+money(total)+' を売上履歴に保存しますか？';
+   document.getElementById('saleConfirmModal').classList.remove('hidden');
+ }catch(e){alert('販売内容の確認中に問題が発生しました。ページを再読み込みして、もう一度お試しください。');}
+});
+document.getElementById('cancelSaleConfirm').addEventListener('click',()=>{
+ pendingSale=null;document.getElementById('saleConfirmModal').classList.add('hidden');
+});
+document.getElementById('acceptSaleConfirm').addEventListener('click',()=>{
+ if(!pendingSale)return;
+ const sale={id:id(),date:new Date().toISOString(),items:pendingSale.items,total:pendingSale.total};
+ state.history.unshift(sale);
+ if(!save()){state.history=state.history.filter(h=>h.id!==sale.id);return;}
+ pendingSale=null;document.getElementById('saleConfirmModal').classList.add('hidden');
+ cart={};renderAll();switchTab('history');
+ alert('売上履歴に保存しました。');
+});
+function renderProducts(){const body=document.getElementById('productTable');body.innerHTML='';state.products.forEach(p=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${esc(p.category)}</td><td><input aria-label="商品名" data-name="${p.id}" value="${esc(p.name)}"></td><td class="num"><input aria-label="価格" data-price="${p.id}" type="number" min="0" step="1" value="${Number(p.price)}" style="width:120px;text-align:right"></td><td><div class="row"><button class="btn small" data-save="${p.id}">保存</button><button class="btn danger small" data-delete="${p.id}">削除</button></div></td>`;body.appendChild(tr);});document.getElementById('productsEmpty').classList.toggle('hidden',state.products.length>0);
+body.querySelectorAll('[data-save]').forEach(b=>b.addEventListener('click',()=>{const p=state.products.find(x=>x.id===b.dataset.save);const name=body.querySelector(`[data-name="${p.id}"]`).value.trim();const price=Number(body.querySelector(`[data-price="${p.id}"]`).value);if(!name){alert('商品名を入力してください。');return;}if(!Number.isInteger(price)||price<0){alert('価格は0以上の整数で入力してください。');return;}p.name=name;p.price=price;save();renderAll();alert('商品情報を保存しました。');}));
+body.querySelectorAll('[data-delete]').forEach(b=>b.addEventListener('click',async()=>{const p=state.products.find(x=>x.id===b.dataset.delete);if(!p)return;const ok=await askConfirm(`「${p.name}」を商品一覧から削除しますか？過去の売上履歴は残ります。`,'商品を削除','削除する');if(!ok)return;state.products=state.products.filter(x=>x.id!==p.id);delete cart[p.id];if(save())renderAll();}));}
+document.getElementById('createProduct').addEventListener('click',()=>{const category=document.getElementById('newCategory').value;const name=document.getElementById('newName').value.trim();const price=Number(document.getElementById('newPrice').value);if(!name){alert('商品名を入力してください。');return;}if(document.getElementById('newPrice').value===''||!Number.isInteger(price)||price<0){alert('価格は0以上の整数で入力してください。');return;}state.products.push({id:id(),category,name,price});save();document.getElementById('newName').value='';document.getElementById('newPrice').value='';renderAll();alert('商品を登録しました。');});
+function renderHistory(){const el=document.getElementById('historyList');el.innerHTML='';const hist=[...state.history].sort((a,b)=>new Date(b.date)-new Date(a.date));document.getElementById('historyEmpty').classList.toggle('hidden',hist.length>0);hist.forEach(h=>{const div=document.createElement('div');div.className='card history-card';const date=new Date(h.date);const when=isNaN(date)?h.date:date.toLocaleString('ja-JP');div.innerHTML=`<div class="history-head"><div><strong>${esc(when)}</strong><div class="muted">${h.items.reduce((n,i)=>n+i.qty,0)}個 · ${h.items.length}種類</div></div><div style="text-align:right"><div class="history-total">${money(h.total)}</div><button class="btn danger small" data-hdel="${h.id}">この履歴を削除</button></div></div><div class="history-lines">${h.items.map(i=>`${esc(i.name)}：${money(i.price)} × ${i.qty} = ${money(i.subtotal)}`).join('<br>')}</div>`;el.appendChild(div);});el.querySelectorAll('[data-hdel]').forEach(b=>b.addEventListener('click',async()=>{const h=state.history.find(x=>x.id===b.dataset.hdel);if(!h)return;const ok=await askConfirm(`売上 ${money(h.total)} の履歴を削除しますか？`,'この履歴を削除','削除する');if(!ok)return;state.history=state.history.filter(x=>x.id!==h.id);if(save())renderHistory();}));}
+document.getElementById('deleteDate').addEventListener('click',async()=>{const date=document.getElementById('historyDate').value;if(!date){alert('削除する日付を選択してください。');return;}const matches=state.history.filter(h=>{const d=new Date(h.date);return !isNaN(d)&&d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')===date;});if(!matches.length){alert('指定日の履歴はありません。');return;}const ok=await askConfirm(`${date} の売上履歴 ${matches.length}件を削除しますか？`,'指定日の履歴を削除','削除する');if(!ok)return;state.history=state.history.filter(h=>!matches.includes(h));if(save()){renderHistory();alert('指定日の履歴を削除しました。');}});
+document.getElementById('deleteAll').addEventListener('click',async()=>{if(!state.history.length){alert('削除する履歴がありません。');return;}const ok=await askConfirm(`売上履歴 ${state.history.length}件をすべて削除します。商品一覧は残ります。この操作は元に戻せません。`,'全履歴を削除','すべて削除');if(!ok)return;state.history=[];if(save())renderHistory();});
+document.getElementById('resetEverything').addEventListener('click',async()=>{const ok=await askConfirm('登録商品と売上履歴をすべて初期化します。必要なデータは先にバックアップしてください。','すべて初期化','初期化する');if(!ok)return;state={products:[],history:[]};cart={};if(save()){renderAll();alert('初期化しました。');}});
+function download(name,content,type){const blob=new Blob([content],{type});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);}
+document.getElementById('exportJson').addEventListener('click',()=>download('flecity-shop-backup-'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(state,null,2),'application/json'));
+document.getElementById('importJson').addEventListener('click',async()=>{const f=document.getElementById('importFile').files[0];if(!f){alert('バックアップファイルを選択してください。');return;}try{const data=JSON.parse(await f.text());if(!data||!Array.isArray(data.products)||!Array.isArray(data.history))throw new Error();if(!confirm('現在の商品一覧と履歴を、選択したバックアップで上書きしますか？'))return;state={products:data.products,history:data.history};cart={};save();renderAll();alert('バックアップを復元しました。');}catch(e){alert('読み込めないファイルです。正しいバックアップJSONを選択してください。');}});
+document.getElementById('exportCsv').addEventListener('click',()=>{if(!state.history.length){alert('出力する履歴がありません。');return;}const rows=[['日時','商品名','カテゴリー','単価($)','数量','小計($)','販売合計($)','履歴ID']];state.history.forEach(h=>h.items.forEach(i=>rows.push([new Date(h.date).toLocaleString('ja-JP'),i.name,i.category,i.price,i.qty,i.subtotal,h.total,h.id])));const csv='\uFEFF'+rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');download('flecity-sales-history-'+new Date().toISOString().slice(0,10)+'.csv',csv,'text/csv;charset=utf-8;');});
+function renderAll(){renderSale();renderProducts();renderHistory();}
+renderAll();
+</script>
+</body>
+</html>
